@@ -23,4 +23,36 @@ cd app/my-json-reader
 npm run dev
 ```
 
+## API
 
+- Set up directory strucutre
+
+### Commands
+
+```bash
+cd api
+```
+- Create python virtual environment
+```bash
+python3 -m venv venv
+```
+
+- Activate venv
+```bash
+source venv/bin/activate
+```
+
+- Install dependencies
+```bash
+pip install django djangorestframework psycopg2-binary
+```
+
+- Install `python-decouple` in order to user environment variables
+```bash
+pip install python-decouple
+``` 
+
+- Save dependencies in requirements.txt
+```bash
+pip freeze > requirements.txt
+```
