@@ -4,7 +4,7 @@
 - [https://github.com/oesterli/my_json-reader.git](https://github.com/oesterli/my_json-reader.git)
 - create dev branch
 ```bash
-
+git checkout -b neuer-branch
 ```
 
 ## App
