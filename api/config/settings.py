@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework' # ON: DRF
+    'rest_framework', # ON: DRF
     'api_app' # ON: api_app
 ]
 
