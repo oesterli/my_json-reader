@@ -56,3 +56,12 @@ pip install python-decouple
 ```bash
 pip freeze > requirements.txt
 ```
+- Create Django project "config"
+```bash
+django-admin startproject config .
+```
+
+- Create Djangp app "api-app"
+```bash
+python manage.py startapp api_app
+```
