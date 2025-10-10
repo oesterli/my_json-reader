@@ -8,6 +8,15 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
+class ApiRootView(APIView):
+    """
+    Gibt eine einfache Willkommens-Nachricht für die Basis-URL /api/ zurück.
+    """
+    def get(self, request):
+        return Response({"message": "Willkommen bei der Basis-URL der API!"})
+
+
+
 class ProxyAPIView(APIView):
     """
     Nimmt eine externe URL entgegen, ruft die API ab
@@ -29,18 +38,6 @@ class ProxyAPIView(APIView):
         except requests.exceptions.RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
         
-
-class ApiRootView(APIView):
-    """
-    Gibt eine einfache Willkommens-Nachricht für die Basis-URL /api/ zurück.
-    """
-    def get(self, request):
-        return Response({"message": "Willkommen bei der Basis-URL der API!"})
-
-
-
-
-
 
 
 from django.http import HttpResponse
@@ -83,3 +80,53 @@ class ProxyAPIViewJSONXML(APIView):
 
         except requests.exceptions.RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+
+from .helpers import fetch_wms_and_convert_to_json
+
+class WMSJsonAPIView(APIView):
+    """
+    Ruft einen WMS-Endpunkt ab, speichert XML & JSON lokal und gibt JSON zurück.
+    """
+    def get(self, request):
+        target_url = request.query_params.get("url")
+        if not target_url:
+            return Response({"error": "Parameter 'url' fehlt"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            data_dict, xml_path, json_path = fetch_wms_and_convert_to_json(target_url)
+            return Response({
+                "message": "WMS erfolgreich abgerufen und konvertiert",
+                "xml_file": xml_path,
+                "json_file": json_path,
+                "data": data_dict
+            })
+        except RuntimeError as e:
+            return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+
+
+from api_app.helpers import fetch_and_save_wms_xml
+
+class WmsFetcher(APIView):
+    """
+    Speichert WMS, WMTS
+    """
+    # est = xml_path, json_path, data_dict
+
+    def get(self, request):
+    
+        xml, json, *rest = fetch_and_save_wms_xml()
+        # print(f"XML gespeichert unter: {file_path}")
+
+        return Response({
+                "message": "Done",
+                "xml": xml,
+                "json": json
+
+            })
+        
+        
+
