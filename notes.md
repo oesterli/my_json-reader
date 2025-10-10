@@ -4,8 +4,9 @@
 - [https://github.com/oesterli/my_json-reader.git](https://github.com/oesterli/my_json-reader.git)
 - create dev branch
 ```bash
-
+git checkout -b develop
 ```
+in github set `develop` as default branch (Settings > General > Default branch) 
 
 ## App
 
