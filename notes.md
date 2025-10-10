@@ -1,6 +1,6 @@
 # Notes for setting up repository "my_json-reader"
 
-## Repsoitory:
+## Repository:
 - [https://github.com/oesterli/my_json-reader.git](https://github.com/oesterli/my_json-reader.git)
 - create dev branch by running
 ```bash
