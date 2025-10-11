@@ -4,7 +4,7 @@ import os
 import json
 import re
 
-def fetch_and_save_wms_xml(
+def fetch_service_save_xml_json(
     save_dir="tmp"
 ):
     """
@@ -29,7 +29,7 @@ def fetch_and_save_wms_xml(
             if match:
                 typ = match.group(1)  # saves "wms" or "wmts"
                 print(typ)
-
+        
             xml_path = os.path.join(save_dir, f'{typ}.xml')
             json_path = os.path.join(save_dir,  f'{typ}.json')
 

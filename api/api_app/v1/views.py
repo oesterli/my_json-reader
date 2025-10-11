@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .helpers import fetch_and_save_wms_xml # WmsFetcher
+from .helpers import fetch_service_save_xml_json # WmsFetcher
 
 
 class ApiRootView(APIView):
@@ -37,6 +37,7 @@ class ProxyAPIView(APIView):
         try:
             response = requests.get(target_url, timeout=10)
             response.raise_for_status()
+
             return Response(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
@@ -45,7 +46,7 @@ class ProxyAPIView(APIView):
 class WmsFetcher(APIView):
     """
     Saves WMS, WMTS
-    imports "fetch_and_save_wms_xml()" from .helpers
+    imports "fetch_service_save_xml_json()" from .helpers
 
     Example call: http://127.0.0.1:8000/api/wms-fetcher/
     """
@@ -53,7 +54,7 @@ class WmsFetcher(APIView):
 
     def get(self, request):
     
-        xml, json, *rest = fetch_and_save_wms_xml()
+        xml, json, *rest = fetch_service_save_xml_json()
         # print(f"XML gespeichert unter: {file_path}")
 
         return Response({
