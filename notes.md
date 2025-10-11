@@ -27,7 +27,7 @@ npm run dev
 
 - Set up directory strucutre
 
-### Commands
+### Basic setup: Commands
 
 ```bash
 cd api
@@ -123,3 +123,81 @@ DATABASES = {
     }
 }
 ```
+### Create view for calling external api
+
+- Install `requests` package
+```bash
+pip install requests
+```
+
+- Update `requirements.txt`
+```bash
+pip freeze > requirements.txt
+```
+
+#### Create `view`for calling external API
+
+- Create view and associated code
+```python
+# api_app/views.py
+import requests
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+
+class ProxyAPIView(APIView):
+    """
+    Nimmt eine externe URL entgegen, ruft die API ab
+    und gibt die JSON-Antwort zurück.
+    """
+
+    def get(self, request):
+        target_url = request.query_params.get("url")
+        if not target_url:
+            return Response(
+                {"error": "Parameter 'url' ist erforderlich"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            response = requests.get(target_url, timeout=10)
+            response.raise_for_status()
+            return Response(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException as e:
+            return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+```
+
+```python
+# api_app/urls.py
+from django.urls import path
+from .views import ProxyAPIView
+
+urlpatterns = [
+    path("proxy/", ProxyAPIView.as_view(), name="proxy-api"),
+]
+```
+
+```python
+# config/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("api/", include("api.urls")),
+]
+```
+
+- Run call API
+
+```bash
+http://127.0.0.1:8000/api/proxy/?url=https://jsonplaceholder.typicode.com/todos/1
+```
+
+## Activate Django admin page
+- Create super user
+```bash
+python manage.py createsuperuser
+```
+- Credentials are stored in `.env``

@@ -10,3 +10,5 @@ venv/
 
 # env files
 .env
+
+tmp/
