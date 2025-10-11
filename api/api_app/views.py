@@ -10,8 +10,6 @@ from rest_framework import status
 from django.http import HttpResponse # For ProxyAPIViewJSONXML
 from urllib.parse import urlparse, parse_qs # For ProxyAPIViewJSONXML
 
-from .helpers import fetch_wms_and_convert_to_json # WMSJsonAPIView
-
 from api_app.helpers import fetch_and_save_wms_xml # WmsFetcher
 
 

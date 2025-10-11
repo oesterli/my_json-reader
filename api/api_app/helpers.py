@@ -4,39 +4,6 @@ import os
 import json
 import re
 
-def fetch_wms_and_convert_to_json(url, xml_filename="wms_response.xml", json_filename="wms_response.json", save_dir="tmp"):
-    """
-    Ruft den WMS-Server ab, speichert XML lokal, konvertiert es in JSON und speichert JSON.
-    """
-    os.makedirs(save_dir, exist_ok=True)
-    xml_path = os.path.join(save_dir, xml_filename)
-    json_path = os.path.join(save_dir, json_filename)
-
-    try:
-        # XML vom WMS-Server abrufen
-        response = requests.get(url, timeout=20)
-        response.raise_for_status()
-
-        # XML speichern
-        with open(xml_path, "w", encoding="utf-8") as f:
-            f.write(response.text)
-
-        # XML in Python-Dict konvertieren
-        data_dict = xmltodict.parse(response.text)
-
-        # JSON speichern
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(data_dict, f, indent=2)
-
-        return data_dict, xml_path, json_path
-
-    except requests.exceptions.RequestException as e:
-        raise RuntimeError(f"Fehler beim Abrufen der WMS-URL: {e}")
-    except Exception as e:
-        raise RuntimeError(f"Fehler beim Konvertieren/Speichern von XML zu JSON: {e}")
-
-
-
 def fetch_and_save_wms_xml(
     save_dir="tmp",
     xml_filename="service_response.xml",
