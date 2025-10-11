@@ -9,6 +9,8 @@ from rest_framework import status
 
 from .helpers import fetch_service_save_xml_json # WmsFetcher
 
+from .helpers import get_json # ProxyAPIView
+
 
 class ApiRootView(APIView):
     """
@@ -19,28 +21,25 @@ class ApiRootView(APIView):
     def get(self, request):
         return Response({"message": "Welcome! This is the base URL of the API"})
 
+
 class ProxyAPIView(APIView):
     """
-    Call the API with an external URL als url-parameter "url" and return a JSON
+    Saves Catalog service
+    imports "get_json()" from .helpers
     
-    Example call: http://127.0.0.1:8000/api/proxy/?url=https://jsonplaceholder.typicode.com/todos/1
+    Example call: http://127.0.0.1:8000/api/proxy/
     """
 
     def get(self, request):
-        target_url = request.query_params.get("url")
-        if not target_url:
-            return Response(
-                {"error": "Parameter 'url' required!"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+       
+        # Call helper function
+        catalog = get_json()
 
-        try:
-            response = requests.get(target_url, timeout=10)
-            response.raise_for_status()
+        return Response({
+            "message": "Done",
+            "catalog": catalog
 
-            return Response(response.json(), status=response.status_code)
-        except requests.exceptions.RequestException as e:
-            return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+        })
 
 
 class WmsFetcher(APIView):
@@ -55,7 +54,6 @@ class WmsFetcher(APIView):
     def get(self, request):
     
         xml, json, *rest = fetch_service_save_xml_json()
-        # print(f"XML gespeichert unter: {file_path}")
 
         return Response({
                 "message": "Done",
