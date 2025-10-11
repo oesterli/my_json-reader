@@ -7,27 +7,35 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.http import HttpResponse # For ProxyAPIViewJSONXML
+from urllib.parse import urlparse, parse_qs # For ProxyAPIViewJSONXML
+
+from .helpers import fetch_wms_and_convert_to_json # WMSJsonAPIView
+
+from api_app.helpers import fetch_and_save_wms_xml # WmsFetcher
+
 
 class ApiRootView(APIView):
     """
-    Gibt eine einfache Willkommens-Nachricht für die Basis-URL /api/ zurück.
+    Returns a welcom message when calling /api/
+    
+    Example call: http://127.0.0.1:8000/api/
     """
     def get(self, request):
-        return Response({"message": "Willkommen bei der Basis-URL der API!"})
-
-
+        return Response({"message": "Welcome! This is the base URL of the API"})
 
 class ProxyAPIView(APIView):
     """
-    Nimmt eine externe URL entgegen, ruft die API ab
-    und gibt die JSON-Antwort zurück.
+    Call the API with an external URL als url-parameter "url" and return a JSON
+    
+    Example call: http://127.0.0.1:8000/api/proxy/?url=https://jsonplaceholder.typicode.com/todos/1
     """
 
     def get(self, request):
         target_url = request.query_params.get("url")
         if not target_url:
             return Response(
-                {"error": "Parameter 'url' ist erforderlich"},
+                {"error": "Parameter 'url' required!"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -37,82 +45,14 @@ class ProxyAPIView(APIView):
             return Response(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
-        
 
-
-from django.http import HttpResponse
-from urllib.parse import urlparse, parse_qs
-
-
-class ProxyAPIViewJSONXML(APIView):
-    """
-    Proxy-Endpoint für externe APIs.
-    Unterstützt JSON, XML und beliebige Query-Parameter.
-    """
-
-    def get(self, request):
-        target_url = request.query_params.get("url")
-        if not target_url:
-            return Response({"error": "Parameter 'url' ist erforderlich"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            # URL in Basis + Query-Parameter aufteilen
-            parsed = urlparse(target_url)
-            base_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
-            query_params = parse_qs(parsed.query)
-
-            # parse_qs liefert Listen als Werte, convertiere zu einzelnen Strings
-            query_params = {k: v[0] for k, v in query_params.items()}
-
-            # Externe API aufrufen
-            resp = requests.get(base_url, params=query_params, timeout=15)
-            resp.raise_for_status()
-
-            # Content-Type prüfen
-            content_type = resp.headers.get("Content-Type", "")
-            if "json" in content_type:
-                return Response(resp.json(), status=resp.status_code)
-            elif "xml" in content_type or resp.text.strip().startswith("<"):
-                return HttpResponse(resp.text, content_type="application/xml", status=resp.status_code)
-            else:
-                # Fallback: Text zurückgeben
-                return HttpResponse(resp.text, content_type="text/plain", status=resp.status_code)
-
-        except requests.exceptions.RequestException as e:
-            return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
-
-
-
-from .helpers import fetch_wms_and_convert_to_json
-
-class WMSJsonAPIView(APIView):
-    """
-    Ruft einen WMS-Endpunkt ab, speichert XML & JSON lokal und gibt JSON zurück.
-    """
-    def get(self, request):
-        target_url = request.query_params.get("url")
-        if not target_url:
-            return Response({"error": "Parameter 'url' fehlt"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            data_dict, xml_path, json_path = fetch_wms_and_convert_to_json(target_url)
-            return Response({
-                "message": "WMS erfolgreich abgerufen und konvertiert",
-                "xml_file": xml_path,
-                "json_file": json_path,
-                "data": data_dict
-            })
-        except RuntimeError as e:
-            return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
-
-
-
-
-from api_app.helpers import fetch_and_save_wms_xml
 
 class WmsFetcher(APIView):
     """
-    Speichert WMS, WMTS
+    Saves WMS, WMTS
+    imports "fetch_and_save_wms_xml()" from .helpers
+
+    Example call: http://127.0.0.1:8000/api/wms-fetcher/
     """
     # est = xml_path, json_path, data_dict
 
