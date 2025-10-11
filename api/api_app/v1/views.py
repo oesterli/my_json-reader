@@ -7,10 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.http import HttpResponse # For ProxyAPIViewJSONXML
-from urllib.parse import urlparse, parse_qs # For ProxyAPIViewJSONXML
-
-from api_app.helpers import fetch_and_save_wms_xml # WmsFetcher
+from .helpers import fetch_and_save_wms_xml # WmsFetcher
 
 
 class ApiRootView(APIView):
