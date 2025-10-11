@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ProxyAPIView, ApiRootView, ProxyAPIViewJSONXML, WMSJsonAPIView, WmsFetcher
+from .views import ProxyAPIView, ApiRootView, WmsFetcher
 
 urlpatterns = [
     path("", ApiRootView.as_view(), name="api-root"),
