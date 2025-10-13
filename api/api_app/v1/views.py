@@ -16,7 +16,7 @@ class ApiRootView(APIView):
     """
     Returns a welcom message when calling /api/
     
-    Example call: http://127.0.0.1:8000/api/
+    Example call: http://127.0.0.1:8000/api/v1/
     """
     def get(self, request):
         return Response({"message": "Welcome! This is the base URL of the API"})
@@ -27,7 +27,7 @@ class ProxyAPIView(APIView):
     Saves Catalog service
     imports "get_json()" from .helpers
     
-    Example call: http://127.0.0.1:8000/api/proxy/
+    Example call: http://127.0.0.1:8000/api/v1/proxy/
     """
 
     def get(self, request):
@@ -47,7 +47,7 @@ class WmsFetcher(APIView):
     Saves WMS, WMTS
     imports "fetch_service_save_xml_json()" from .helpers
 
-    Example call: http://127.0.0.1:8000/api/wms-fetcher/
+    Example call: http://127.0.0.1:8000/api/v1/wms-fetcher/
     """
     # est = xml_path, json_path, data_dict
 

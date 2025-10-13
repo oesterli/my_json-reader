@@ -33,6 +33,8 @@ def fetch_service_save_xml_json(
             xml_path = os.path.join(save_dir, f'{typ}.xml')
             json_path = os.path.join(save_dir,  f'{typ}.json')
 
+            print(xml_path)
+
             # Request WMS-Server
             response = requests.get(url, timeout=20)
             response.raise_for_status()
@@ -76,7 +78,8 @@ def get_json():
             typ = match.group(1)  # saves "wms" or "wmts"
             print(typ)
 
-        catalog_path = os.path.join(save_dir, f'{typ}.json')
+        catalog_path = os.path.join(save_dir, f'{typ}_{l}.json')
+        print(catalog_path)
 
         # API abfragen
         response = requests.get(url)
@@ -86,16 +89,10 @@ def get_json():
             # JSON-Daten als Python-Objekt
             data = response.json()
 
-            # Variable: Daten sind jetzt in 'data'
-            # print("JSON-Daten:", data)
-            # print(json.dumps(data, indent=4, ensure_ascii=False))       
-
-            # JSON(data)
-
             # Auf Dateisystem speichern
-            with open(f"{catalog_path}_{l}.json", "w", encoding="utf-8") as f:
+            with open(f"{catalog_path}.json", "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
-            print(f"Data successfully saved in daten_{l}.json gespeichert.")
+            print(f"Data successfully saved in {typ}_{l}.json gespeichert.")
         else:
             print(f"Error {response.status_code}: {response.text}")
