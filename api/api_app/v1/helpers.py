@@ -4,8 +4,9 @@ import os
 import json
 import re
 
+
 def fetch_service_save_xml_json(
-    save_dir="tmp"
+    save_dir = "tmp"
 ):
     """
     Call a hard coded WMS- or WMTS-URL and save response as XML and convert ans save it as JSON
@@ -54,20 +55,23 @@ def fetch_service_save_xml_json(
 
     except requests.exceptions.RequestException as e:
         raise RuntimeError(f"Error when calling WMS- or WMTS-URL: {e}")
+        
 
 
 
-def get_json():
+def get_json(
+        save_dir="tmp"
+        ):
     """
     Call hard coded Catalog API and loop over language version and save it as separate json files
     """
-    save_dir="tmp"
     
     # Define storage directory
     os.makedirs(save_dir, exist_ok=True)
 
 
     lang = ["de", "en", "fr", "it"]
+    catalog_array = []
     for l in lang:
         url = f"https://api3.geo.admin.ch/rest/services/geol/CatalogServer?lang={l}"
         print(url)
@@ -79,6 +83,8 @@ def get_json():
             print(typ)
 
         catalog_path = os.path.join(save_dir, f'{typ}_{l}.json')
+        catalog_array.append(catalog_path)
+        
         print(catalog_path)
 
         # API abfragen
@@ -90,9 +96,13 @@ def get_json():
             data = response.json()
 
             # Auf Dateisystem speichern
-            with open(f"{catalog_path}.json", "w", encoding="utf-8") as f:
+            with open(f"{catalog_path}", "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
             print(f"Data successfully saved in {typ}_{l}.json gespeichert.")
+
+    
         else:
             print(f"Error {response.status_code}: {response.text}")
+
+    return catalog_array

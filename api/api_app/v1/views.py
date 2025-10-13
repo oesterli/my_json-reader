@@ -31,15 +31,19 @@ class ProxyAPIView(APIView):
     """
 
     def get(self, request):
+        try:
        
-        # Call helper function
-        catalog = get_json()
+            # Call helper function
+            catalog = get_json()
 
-        return Response({
-            "message": "Done",
-            "catalog": catalog
-
-        })
+            return Response({
+                "message": "Done",
+                "catalog": catalog
+             })
+        except:
+            return Response({
+                "message": "Error! Something went wrong"
+             })
 
 
 class WmsFetcher(APIView):
