@@ -19,10 +19,10 @@ class ApiRootView(APIView):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # -------------------------
-class ProxyAPIView(APIView):
+class CatalogApiView(APIView):
     """
     Saves Catalog service
-    imports "get_json()" from .helpers
+    imports "fetch_catalog_save_response()" from .api_functions.py
     Example call: http://127.0.0.1:8000/api/v1/catalog/
     """
     def get(self, request):
@@ -49,10 +49,10 @@ class ProxyAPIView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # -------------------------
-class WmsFetcher(APIView):
+class WmsApiView(APIView):
     """
     Saves WMS, WMTS
-    imports "fetch_service_save_xml_json()" from .helpers
+    imports "ffetch_wmts_wms_save_response()" from .api_functions.py
     Example call: http://127.0.0.1:8000/api/v1/wms/
     """
     def get(self, request):
@@ -63,7 +63,6 @@ class WmsFetcher(APIView):
                 "message": "Done",
                 "xml": xml,
                 "json": json
-
             })
         
         

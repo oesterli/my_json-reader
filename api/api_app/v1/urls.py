@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import ProxyAPIView, ApiRootView, WmsFetcher
+from .views import CatalogApiView, ApiRootView, WmsApiView
 
 urlpatterns = [
     path("", ApiRootView.as_view(), name="api-root"),
-    path("catalog/", ProxyAPIView.as_view(), name="catalog-fetcher"),
-    path("wms/", WmsFetcher.as_view(), name="wms-fetcher"),
+    path("catalog/", CatalogApiView.as_view(), name="catalog-fetcher"),
+    path("wms/", WmsApiView.as_view(), name="wms-fetcher"),
 ]
 
