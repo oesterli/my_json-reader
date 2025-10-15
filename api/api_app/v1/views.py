@@ -1,63 +1,63 @@
-from django.shortcuts import render
-
-# Create your views here.
-
-import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from .api_functions import fetch_wmts_wms_save_response # WmsFetcher
+from .api_functions import fetch_catalog_save_response # ProxyAPIView
 
-from .helpers import fetch_service_save_xml_json # WmsFetcher
-
-from .helpers import get_json # ProxyAPIView
-
-
+# -------------------------
 class ApiRootView(APIView):
     """
-    Returns a welcom message when calling /api/
-    
+    Returns a welcome message when calling /api/
     Example call: http://127.0.0.1:8000/api/v1/
     """
     def get(self, request):
-        return Response({"message": "Welcome! This is the base URL of the API"})
+        try:
+            message = {"message": "Welcome! This is the base URL of the API"}
+            return Response(message, status=status.HTTP_200_OK)
+        except Exception as e:
+            message = {"error": f"Unecpected error: {str(e)}"}
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+# -------------------------
 class ProxyAPIView(APIView):
     """
     Saves Catalog service
     imports "get_json()" from .helpers
-    
-    Example call: http://127.0.0.1:8000/api/v1/proxy/
+    Example call: http://127.0.0.1:8000/api/v1/catalog/
     """
-
     def get(self, request):
         try:
-       
-            # Call helper function
-            catalog = get_json()
+            result = fetch_catalog_save_response()
+
+            if result["errors"]:
+                return Response({
+                    "message": "Errors occurred",
+                    "saved_files": result["saved_files"],
+                    "errors": result["errors"]
+                }, status=status.HTTP_502_BAD_GATEWAY)
 
             return Response({
                 "message": "Done",
-                "catalog": catalog
-             })
-        except:
+                "saved_files": result["saved_files"]
+            })
+
+        except Exception as e:
+            # Fallback für unerwartete Fehler in der View selbst
             return Response({
-                "message": "Error! Something went wrong"
-             })
+                "message": "Unexpected error in view",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+# -------------------------
 class WmsFetcher(APIView):
     """
     Saves WMS, WMTS
     imports "fetch_service_save_xml_json()" from .helpers
-
-    Example call: http://127.0.0.1:8000/api/v1/wms-fetcher/
+    Example call: http://127.0.0.1:8000/api/v1/wms/
     """
-    # est = xml_path, json_path, data_dict
-
     def get(self, request):
     
-        xml, json, *rest = fetch_service_save_xml_json()
+        xml, json, *rest = fetch_wmts_wms_save_response()
 
         return Response({
                 "message": "Done",

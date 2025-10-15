@@ -5,7 +5,7 @@ import json
 import re
 
 
-def fetch_service_save_xml_json(
+def fetch_wmts_wms_save_response(
     save_dir = "tmp"
 ):
     """
@@ -59,11 +59,16 @@ def fetch_service_save_xml_json(
 
 
 
-def get_json(
+def fetch_catalog_save_response(
         save_dir="tmp"
         ):
     """
     Call hard coded Catalog API and loop over language version and save it as separate json files
+    Returns:
+    dict: {
+        "saved_files": [...],
+        "errors": [...]
+    }
     """
     
     # Define storage directory
@@ -72,27 +77,30 @@ def get_json(
 
     lang = ["de", "en", "fr", "it"]
     catalog_array = []
+    errors = []
+
     for l in lang:
-        url = f"https://api3.geo.admin.ch/rest/services/geol/CatalogServer?lang={l}"
-        print(url)
+        try:
+            url = f"https://api3.geo.admin.ch/rest/services/geol/CatalogServer?lang={l}"
+            print(url)
 
-        # Filter Characters after "https://" and "." in service-URL 
-        match = re.search(r"^https://([^\.]+)\.", url)
-        if match:
-            typ = match.group(1)  # saves "wms" or "wmts"
-            print(typ)
+            # Filter Characters after "https://" and "." in service-URL 
+            match = re.search(r"^https://([^\.]+)\.", url)
+            if match:
+                typ = match.group(1)  # saves "wms" or "wmts"
+                print(typ)
+            else:
+                typ = f"unkown_{l}"
 
-        catalog_path = os.path.join(save_dir, f'{typ}_{l}.json')
-        catalog_array.append(catalog_path)
-        
-        print(catalog_path)
+            catalog_path = os.path.join(save_dir, f'{typ}_{l}.json')
+            catalog_array.append(catalog_path)
+            
+            print(catalog_path)
 
-        # API abfragen
-        response = requests.get(url)
+            # API abfragen
+            response = requests.get(url)
+            response.raise_for_status
 
-        # Prüfen, ob die Anfrage erfolgreich war
-        if response.status_code == 200:
-            # JSON-Daten als Python-Objekt
             data = response.json()
 
             # Auf Dateisystem speichern
@@ -102,7 +110,11 @@ def get_json(
             print(f"Data successfully saved in {typ}_{l}.json gespeichert.")
 
     
-        else:
-            print(f"Error {response.status_code}: {response.text}")
+        except requests.exceptions.RequestException as e:
+            errors.append(f"Request error for lang={l}: {e}")
+        except json.JSONDecodeError as e:
+            errors.append(f"JSON decode error for lang={l}: {e}")
+        except Exception as e:
+            errors.append(f"Unexpected error for lang={l}: {e}")
 
-    return catalog_array
+    return {"saved_files": catalog_array, "errors": errors}
