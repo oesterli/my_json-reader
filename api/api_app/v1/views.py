@@ -15,7 +15,7 @@ class ApiRootView(APIView):
             message = {"message": "Welcome! This is the base URL of the API"}
             return Response(message, status=status.HTTP_200_OK)
         except Exception as e:
-            message = {"error": f"Unecpected error: {str(e)}"}
+            message = {"error": f"Unexpected error: {str(e)}"}
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # -------------------------
