@@ -19,13 +19,12 @@ def fetch_catalog_save_response(
     # Define storage directory
     os.makedirs(save_dir, exist_ok=True)
 
-
     lang = ["de", "en", "fr", "it"]
-    catalog_array = []
+    file_array = []
     errors = []
 
-    for l in lang:
-        try:
+    try:
+        for l in lang:
             url = f"https://api3.geo.admin.ch/rest/services/geol/CatalogServer?lang={l}"
             print(url)
 
@@ -38,39 +37,47 @@ def fetch_catalog_save_response(
                 typ = f"unkown_{l}"
 
             catalog_path = os.path.join(save_dir, f'{typ}_{l}.json')
-            catalog_array.append(catalog_path)
+            file_array.append(catalog_path)
             
             print(catalog_path)
 
-            # API abfragen
+            # Request API 
             response = requests.get(url)
             response.raise_for_status
 
             data = response.json()
 
-            # Auf Dateisystem speichern
+            # Save to file system
             with open(f"{catalog_path}", "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
-            print(f"Data successfully saved in {typ}_{l}.json gespeichert.")
+            print(f"Data successfully saved in {typ}_{l}.json")
+
+        return {
+            "saved_files": file_array, 
+            "errors": errors
+            }
 
     
-        except requests.exceptions.RequestException as e:
-            errors.append(f"Request error for lang={l}: {e}")
-        except json.JSONDecodeError as e:
-            errors.append(f"JSON decode error for lang={l}: {e}")
-        except Exception as e:
-            errors.append(f"Unexpected error for lang={l}: {e}")
+    except requests.exceptions.RequestException as e:
+        errors.append(f"Request error for lang={l}: {e}")
+    except json.JSONDecodeError as e:
+        errors.append(f"JSON decode error for lang={l}: {e}")
+    except Exception as e:
+        errors.append(f"Unexpected error for lang={l}: {e}")
 
-    return {"saved_files": catalog_array, "errors": errors}
+    
 
 
 def fetch_wmts_wms_save_response(
-    save_dir = "tmp"
-):
+        save_dir = "tmp"
+        ):
     """
     Call a hard coded WMS- or WMTS-URL and save response as XML and convert ans save it as JSON
     """
+
+    # Define storage directory
+    os.makedirs(save_dir, exist_ok=True)
 
     #  WMS- and WMTS-URL (hard coded)
     wms_url = "https://wms.geo.admin.ch/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
@@ -78,8 +85,8 @@ def fetch_wmts_wms_save_response(
 
     urls = [wms_url, wmts_url]
 
-    # Define storage directory
-    os.makedirs(save_dir, exist_ok=True)
+    file_array = []
+    errors = []
 
     try:
         for url in urls:
@@ -90,13 +97,17 @@ def fetch_wmts_wms_save_response(
             if match:
                 typ = match.group(1)  # saves "wms" or "wmts"
                 print(typ)
+            else:
+                typ = f"unkown_{url}"
         
             xml_path = os.path.join(save_dir, f'{typ}.xml')
+            file_array.append(xml_path)
             json_path = os.path.join(save_dir,  f'{typ}.json')
+            file_array.append(json_path)
 
-            print(xml_path)
+            print(file_array)
 
-            # Request WMS-Server
+            # Request WMS- / WMTS-Service
             response = requests.get(url, timeout=20)
             response.raise_for_status()
 
@@ -104,15 +115,28 @@ def fetch_wmts_wms_save_response(
             with open(xml_path, "w", encoding="utf-8") as f:
                 f.write(response.text)
 
+            print(f"Data successfully saved in {typ}.xml")
+
             # Convert XML in Python-Dict
             data_dict = xmltodict.parse(response.text)
 
-            # Save speichern
+            # Save JSON
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(data_dict, f, indent=2)    
 
-        return xml_path, json_path, data_dict
+            print(f"Data successfully saved in {typ}.json")
+
+        return {
+            "saved_files": file_array,
+            "errors": errors,
+            }
 
     except requests.exceptions.RequestException as e:
-        raise RuntimeError(f"Error when calling WMS- or WMTS-URL: {e}")
+        errors.append(f"Request error for {url}: {e}")
+    except json.JSONDecodeError as e:
+        errors.append(f"JSON decode error for {url}: {e}")
+    except RuntimeError as e:
+        errors.append(f"Error when calling WMS- or WMTS-URL: {e}")
+    except Exception as e:
+        errors.append(f"Unexpected error for {url}: {e}")
         
