@@ -38,7 +38,8 @@ class CatalogApiView(APIView):
 
             return Response({
                 "message": "Done",
-                "saved_files": result["saved_files"]
+                "saved_files": result["saved_files"],
+                "data":result["data"]
             })
 
         except Exception as e:
@@ -70,6 +71,7 @@ class WmsApiView(APIView):
             return Response({
                     "message": "Done",
                     "saved_files": result["saved_files"],
+                    "data": result["data"]
                 })
         
         except Exception as e:

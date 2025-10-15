@@ -12,7 +12,8 @@ def fetch_catalog_save_response(
     Returns:
     dict: {
         "saved_files": [...],
-        "errors": [...]
+        "errors": [...],
+        "data": [...]
     }
     """
     
@@ -22,6 +23,7 @@ def fetch_catalog_save_response(
     lang = ["de", "en", "fr", "it"]
     file_array = []
     errors = []
+    data_dict = {}
 
     try:
         for l in lang:
@@ -47,7 +49,9 @@ def fetch_catalog_save_response(
 
             data = response.json()
 
-            # Save to file system
+            data_dict.update({f"catalog_{l}": f"{data}"})
+
+            # Save to file filesystem
             with open(f"{catalog_path}", "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
@@ -55,7 +59,8 @@ def fetch_catalog_save_response(
 
         return {
             "saved_files": file_array, 
-            "errors": errors
+            "errors": errors,
+            "data": data_dict
             }
 
     
@@ -67,13 +72,17 @@ def fetch_catalog_save_response(
         errors.append(f"Unexpected error for lang={l}: {e}")
 
     
-
-
 def fetch_wmts_wms_save_response(
         save_dir = "tmp"
         ):
     """
     Call a hard coded WMS- or WMTS-URL and save response as XML and convert ans save it as JSON
+    Returns:
+    dict: {
+        "saved_files": [...],
+        "errors": [...],
+        "data": [...]
+    }
     """
 
     # Define storage directory
@@ -87,6 +96,7 @@ def fetch_wmts_wms_save_response(
 
     file_array = []
     errors = []
+    data_dict = {}
 
     try:
         for url in urls:
@@ -118,17 +128,20 @@ def fetch_wmts_wms_save_response(
             print(f"Data successfully saved in {typ}.xml")
 
             # Convert XML in Python-Dict
-            data_dict = xmltodict.parse(response.text)
+            xml_dict = xmltodict.parse(response.text)
 
             # Save JSON
             with open(json_path, "w", encoding="utf-8") as f:
-                json.dump(data_dict, f, indent=2)    
+                json.dump(xml_dict, f, indent=2)    
+
+            data_dict.update({f"{typ}_data": f"{xml_dict}"})
 
             print(f"Data successfully saved in {typ}.json")
 
         return {
             "saved_files": file_array,
             "errors": errors,
+            "data": data_dict
             }
 
     except requests.exceptions.RequestException as e:
