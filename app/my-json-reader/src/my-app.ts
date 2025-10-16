@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import "./api-view"
 
 @customElement("my-app")
 export class MyApp extends LitElement {
@@ -48,6 +49,10 @@ export class MyApp extends LitElement {
         : this.data
         ? html`<h2>Response:</h2><pre>${JSON.stringify(this.data, null, 2)}</pre>`
         : html`<p>Noch keine Daten geladen.</p>`}
+
+      <api-view url="http://localhost:8000/api/v1/"></api-view>
+      <api-view url="http://localhost:8000/api/v1/catalog/"></api-view>
+      <api-view url="http://localhost:8000/api/v1/wms/"></api-view>
     `;
   } 
 
