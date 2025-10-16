@@ -38,7 +38,7 @@ export class MyApp extends LitElement {
 
   render() {
     return html`
-      <h1>📡 API-Daten mit Lit + TypeScript</h1>
+      <h1>📡 Call base URL od API</h1>
       <button @click=${this._fetchData}>API abrufen</button>
 
       ${this.loading
@@ -46,10 +46,10 @@ export class MyApp extends LitElement {
         : this.error
         ? html`<p style="color:red;">Fehler: ${this.error}</p>`
         : this.data
-        ? html`<pre>${JSON.stringify(this.data, null, 2)}</pre>`
+        ? html`<h2>Response:</h2><pre>${JSON.stringify(this.data, null, 2)}</pre>`
         : html`<p>Noch keine Daten geladen.</p>`}
     `;
-  }
+  } 
 
   private async _fetchData() {
     this.loading = true;
