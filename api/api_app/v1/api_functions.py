@@ -4,6 +4,7 @@ import os
 import json
 import re
 
+# -------------------------
 def fetch_catalog_save_response(
         save_dir="tmp"
         ):
@@ -71,7 +72,8 @@ def fetch_catalog_save_response(
     except Exception as e:
         errors.append(f"Unexpected error for lang={l}: {e}")
 
-    
+
+# -------------------------    
 def fetch_wmts_wms_save_response(
         save_dir = "tmp"
         ):
