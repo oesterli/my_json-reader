@@ -15,14 +15,14 @@ class ApiRootView(APIView):
             message = {"message": "Welcome! This is the base URL of the API"}
             return Response(message, status=status.HTTP_200_OK)
         except Exception as e:
-            message = {"error": f"Unecpected error: {str(e)}"}
+            message = {"error": f"Unexpected error: {str(e)}"}
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # -------------------------
-class ProxyAPIView(APIView):
+class CatalogApiView(APIView):
     """
     Saves Catalog service
-    imports "get_json()" from .helpers
+    imports "fetch_catalog_save_response()" from .api_functions.py
     Example call: http://127.0.0.1:8000/api/v1/catalog/
     """
     def get(self, request):
@@ -38,7 +38,8 @@ class ProxyAPIView(APIView):
 
             return Response({
                 "message": "Done",
-                "saved_files": result["saved_files"]
+                "saved_files": result["saved_files"],
+                "data":result["data"]
             })
 
         except Exception as e:
@@ -49,22 +50,34 @@ class ProxyAPIView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # -------------------------
-class WmsFetcher(APIView):
+class WmsApiView(APIView):
     """
     Saves WMS, WMTS
-    imports "fetch_service_save_xml_json()" from .helpers
+    imports "ffetch_wmts_wms_save_response()" from .api_functions.py
     Example call: http://127.0.0.1:8000/api/v1/wms/
     """
     def get(self, request):
-    
-        xml, json, *rest = fetch_wmts_wms_save_response()
+        try:
+            result = fetch_wmts_wms_save_response()
 
-        return Response({
-                "message": "Done",
-                "xml": xml,
-                "json": json
+            if result["errors"]:
+                return Response({
+                    "message": "Errors occurred",
+                    "saved_files": result["saved_files"],
+                    "errors": result["errors"]
+                }, status=status.HTTP_502_BAD_GATEWAY)
 
-            })
+
+            return Response({
+                    "message": "Done",
+                    "saved_files": result["saved_files"],
+                    "data": result["data"]
+                })
         
+        except Exception as e:
+            return Response({
+                "message": "Unexpected error in view",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
