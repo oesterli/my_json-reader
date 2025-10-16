@@ -64,7 +64,7 @@ export class MyApp extends LitElement {
     try {
       // Beispiel-API: JSONPlaceholder (kannst du anpassen)
       // const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
-      const res = await fetch("http://localhost:8000/api/v1/");
+      const res = await fetch("http://localhost:8000/api/v1/catalog/");
       if (!res.ok) throw new Error(`HTTP-Fehler: ${res.status}`);
       this.data = await res.json();
     } catch (err: any) {
