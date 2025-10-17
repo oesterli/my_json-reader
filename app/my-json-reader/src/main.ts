@@ -1,3 +1,2 @@
 import "./my-app";
-import "./post-card";
-
+import "../../../playground2/crap-app";
