@@ -50,7 +50,8 @@ export class ApiView extends LitElement {
 
     return html`
       ${this.data.map(
-        (item) => html`<post-card .title=${item.message}></post-card>`
+        (item) => html`<post-card .data=${item}></post-card>`
+        
       )}
     `;
   }
