@@ -50,7 +50,7 @@ def fetch_catalog_save_response(
 
             data = response.json()
 
-            data_dict.update({f"catalog_{l}": f"{data}"})
+            data_dict.update({f"catalog_{l}": data})
 
             # Save to file filesystem
             with open(f"{catalog_path}", "w", encoding="utf-8") as f:
