@@ -1,27 +1,50 @@
 import { LitElement, html, css } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, state, property} from "lit/decorators.js";
 
 @customElement("crap-app")
 export class CrapApp extends LitElement {
-  @state() private data: any = null;
+ 
+  // Property only internally availble
+  @state() private check: boolean = true;
+ 
+ // Publicly availble property
+ @property({ type: String }) name = 'Default name';
 
-
+ // Define styles for this element 
   static styles = css`
+    .overall-wrapper {
+      background-color: beige;
+    }
+
     h1 {
       display: block;
       font-family: system-ui, sans-serif;
       padding: 1.5rem;
       color: #333;
     }
-    div {
+    .info {
         background-color: green;
     }
   `;
 
+// Render element
   render() {
     return html`
-      <h1>💩Crap-App💩</h1>
-      <div></div>
+      <div class=overall-wrapper>
+        <h1>💩Crap-App💩</h1>
+        <div class=info>${this.name}</div>
+        <div>Inital state: ${this.check}</div>
+        <div ${this._check()}> State changed: ${this.check}</div>
+      </div>
+
     `;
   }
+
+// Define a function
+private _check() {
+  this.check = false;
+}
+  
+
+
 }
