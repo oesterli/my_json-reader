@@ -30,6 +30,14 @@ body {
   min-height: 100vh;
 }
 
+/* vvv My styles vvv */
+.overall-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ^^^ My styles ^^^ */
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

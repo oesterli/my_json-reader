@@ -1,2 +1,2 @@
-import "./my-app";
-import "../../../playground2/crap-app";
+import "./elements/my-app";
+import "./playground-app/crap-app";

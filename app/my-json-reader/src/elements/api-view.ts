@@ -1,7 +1,7 @@
 // src/api-view.ts
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { ApiService } from "./api-service";
+import { ApiService } from "../utils/api-service";
 import "./post-card"; // Import der Unterkomponente
 
 @customElement("api-view")
