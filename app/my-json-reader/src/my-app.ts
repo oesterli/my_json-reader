@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import "./api-view"
 
 @customElement("my-app")
 export class MyApp extends LitElement {
@@ -38,7 +39,7 @@ export class MyApp extends LitElement {
 
   render() {
     return html`
-      <h1>📡 API-Daten mit Lit + TypeScript</h1>
+      <h1>📡 Call base URL od API</h1>
       <button @click=${this._fetchData}>API abrufen</button>
 
       ${this.loading
@@ -46,10 +47,14 @@ export class MyApp extends LitElement {
         : this.error
         ? html`<p style="color:red;">Fehler: ${this.error}</p>`
         : this.data
-        ? html`<pre>${JSON.stringify(this.data, null, 2)}</pre>`
+        ? html`<h2>Response:</h2><pre>${JSON.stringify(this.data, null, 2)}</pre>`
         : html`<p>Noch keine Daten geladen.</p>`}
+
+      <api-view url="http://localhost:8000/api/v1/"></api-view>
+      <api-view url="http://localhost:8000/api/v1/catalog/"></api-view>
+      <api-view url="http://localhost:8000/api/v1/wms/"></api-view>
     `;
-  }
+  } 
 
   private async _fetchData() {
     this.loading = true;
@@ -59,7 +64,7 @@ export class MyApp extends LitElement {
     try {
       // Beispiel-API: JSONPlaceholder (kannst du anpassen)
       // const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
-      const res = await fetch("http://localhost:8000/api/v1/");
+      const res = await fetch("http://localhost:8000/api/v1/catalog/");
       if (!res.ok) throw new Error(`HTTP-Fehler: ${res.status}`);
       this.data = await res.json();
     } catch (err: any) {
